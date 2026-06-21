@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aetheria | Your Daily Mindspace & Journal</title>
+  <!-- SEO & Metadata -->
+  <meta name="description" content="A beautiful, secure, and private daily journal to track your thoughts, moods, and memories. Persistent local storage and interactive analytics.">
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <!-- CSS -->
+  <link rel="stylesheet" href="style.css">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" id="sidebar">
+      <div class="logo-area">
+        <div class="logo-icon">
+          <i data-lucide="book-open"></i>
+        </div>
+        <span class="logo-text">Aetheria</span>
+      </div>
+      
+      <nav class="nav-links">
+        <button class="nav-btn active" data-target="dashboard" id="nav-dashboard">
+          <i data-lucide="layout-dashboard"></i>
+          <span>Dashboard</span>
+        </button>
+        <button class="nav-btn" data-target="editor" id="nav-editor">
+          <i data-lucide="pen-tool"></i>
+          <span>Write Entry</span>
+        </button>
+        <button class="nav-btn" data-target="calendar" id="nav-calendar">
+          <i data-lucide="calendar"></i>
+          <span>Calendar</span>
+        </button>
+        <button class="nav-btn" data-target="analytics" id="nav-analytics">
+          <i data-lucide="bar-chart-3"></i>
+          <span>Analytics</span>
+        </button>
+        <button class="nav-btn" data-target="settings" id="nav-settings">
+          <i data-lucide="settings"></i>
+          <span>Settings</span>
+        </button>
+      </nav>
+
+      <div class="user-profile">
+        <div class="profile-avatar">
+          <i data-lucide="user"></i>
+        </div>
+        <div class="profile-info">
+          <span class="profile-name" id="user-greeting-name">Journaler</span>
+          <div class="profile-cloud-status" id="sidebar-cloud-status">
+            <span class="status-dot offline"></span>
+            <span class="status-text">Local Vault</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Mobile Nav Header -->
+    <header class="mobile-header">
+      <div class="logo-area">
+        <div class="logo-icon">
+          <i data-lucide="book-open"></i>
+        </div>
+        <span class="logo-text">Aetheria</span>
+      </div>
+      <button class="menu-toggle" id="menu-toggle-btn" aria-label="Toggle menu">
+        <i data-lucide="menu"></i>
+      </button>
+    </header>
+
+    <!-- Mobile Navigation Drawer Overlay -->
+    <div class="mobile-nav-overlay" id="mobile-nav-overlay"></div>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      
+      <!-- 1. DASHBOARD VIEW -->
+      <section class="view-section active" id="view-dashboard">
+        <header class="view-header">
+          <div class="welcome-section">
+            <h1 class="view-title" id="dashboard-welcome">Good day, Friend</h1>
+            <p class="view-subtitle" id="dashboard-date">June 22, 2026</p>
+          </div>
+          <button class="btn btn-primary" onclick="app.navigateTo('editor')">
+            <i data-lucide="plus"></i>
+            <span>New Entry</span>
+          </button>
+        </header>
+
+        <!-- Stats Overview Cards -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon info">
+              <i data-lucide="book"></i>
+            </div>
+            <div class="stat-content">
+              <span class="stat-label">Total Entries</span>
+              <span class="stat-value" id="stats-total-entries">0</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon success">
+              <i data-lucide="zap"></i>
+            </div>
+            <div class="stat-content">
+              <span class="stat-label">Writing Streak</span>
+              <span class="stat-value" id="stats-streak">0 days</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon warning">
+              <i data-lucide="smile"></i>
+            </div>
+            <div class="stat-content">
+              <span class="stat-label">Dominant Mood</span>
+              <span class="stat-value" id="stats-dominant-mood">—</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Timeline Filters & Entries -->
+        <div class="timeline-container">
+          <div class="timeline-header-controls">
+            <h2>Journal Timeline</h2>
+            <div class="filters-bar">
+              <div class="search-input-wrapper">
+                <i data-lucide="search" class="search-icon"></i>
+                <input type="text" id="search-input" placeholder="Search entries, tags...">
+              </div>
+              <select id="filter-mood" class="filter-select">
+                <option value="">All Moods</option>
+                <option value="5">🔥 Rad</option>
+                <option value="4">😊 Good</option>
+                <option value="3">😐 Meh</option>
+                <option value="2">😔 Awful</option>
+                <option value="1">😢 Terrible</option>
+              </select>
+              <select id="filter-tag" class="filter-select">
+                <option value="">All Tags</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Entries List Grid -->
+          <div class="entries-grid" id="entries-list">
+            <!-- Dynamic entries loaded here -->
+            <div class="empty-state" id="timeline-empty-state">
+              <div class="empty-icon">
+                <i data-lucide="feather"></i>
+              </div>
+              <h3>Start your journey</h3>
+              <p>Write your first entry today. Capture your thoughts, feelings, and memories.</p>
+              <button class="btn btn-primary" onclick="app.navigateTo('editor')">Write First Entry</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. EDITOR VIEW -->
+      <section class="view-section" id="view-editor">
+        <header class="view-header">
+          <div>
+            <h1 class="view-title" id="editor-title-heading">Capture the Moment</h1>
+            <p class="view-subtitle">Your words are safe, encrypted in local workspace storage.</p>
+          </div>
+          <div class="editor-actions">
+            <button class="btn btn-secondary" onclick="app.cancelEdit()">
+              Cancel
+            </button>
+            <button class="btn btn-primary" id="save-entry-btn">
+              <i data-lucide="save"></i>
+              <span>Save Entry</span>
+            </button>
+          </div>
+        </header>
+
+        <div class="editor-layout">
+          <div class="editor-main-card glass-card">
+            <!-- Title & Date -->
+            <div class="editor-fields-row">
+              <div class="field-group flex-3">
+                <label for="entry-title">Title</label>
+                <input type="text" id="entry-title" placeholder="Give your day a name..." required autocomplete="off">
+              </div>
+              <div class="field-group flex-1">
+                <label for="entry-date">Date</label>
+                <input type="date" id="entry-date" required>
+              </div>
+            </div>
+
+            <!-- Mood Picker -->
+            <div class="field-group">
+              <label>How are you feeling today?</label>
+              <div class="mood-selector" id="mood-selector-container">
+                <button type="button" class="mood-btn" data-mood="5" title="Rad">
+                  <span class="mood-emoji">🔥</span>
+                  <span class="mood-name">Rad</span>
+                </button>
+                <button type="button" class="mood-btn" data-mood="4" title="Good">
+                  <span class="mood-emoji">😊</span>
+                  <span class="mood-name">Good</span>
+                </button>
+                <button type="button" class="mood-btn" data-mood="3" title="Meh">
+                  <span class="mood-emoji">😐</span>
+                  <span class="mood-name">Meh</span>
+                </button>
+                <button type="button" class="mood-btn" data-mood="2" title="Awful">
+                  <span class="mood-emoji">😔</span>
+                  <span class="mood-name">Awful</span>
+                </button>
+                <button type="button" class="mood-btn" data-mood="1" title="Terrible">
+                  <span class="mood-emoji">😢</span>
+                  <span class="mood-name">Terrible</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Markdown Helper Toolbar -->
+            <div class="textarea-toolbar">
+              <button type="button" title="Bold" onclick="app.insertMarkdown('**', '**')"><i data-lucide="bold"></i></button>
+              <button type="button" title="Italic" onclick="app.insertMarkdown('*', '*')"><i data-lucide="italic"></i></button>
+              <button type="button" title="Heading" onclick="app.insertMarkdown('\n### ', '')"><i data-lucide="heading"></i></button>
+              <button type="button" title="Quote" onclick="app.insertMarkdown('\n> ', '')"><i data-lucide="quote"></i></button>
+              <button type="button" title="Bullet List" onclick="app.insertMarkdown('\n- ', '')"><i data-lucide="list"></i></button>
+              <button type="button" title="Numbered List" onclick="app.insertMarkdown('\n1. ', '')"><i data-lucide="list-ordered"></i></button>
+              <span class="toolbar-divider"></span>
+              <button type="button" id="toggle-preview-btn" title="Toggle Preview Mode" onclick="app.toggleEditorPreview()">
+                <i data-lucide="eye"></i>
+                <span class="btn-text">Preview</span>
+              </button>
+            </div>
+
+            <!-- Text Content and Preview -->
+            <div class="editor-content-container">
+              <textarea id="entry-content" placeholder="Start writing here... supports basic markdown style for formatting." class="editor-textarea"></textarea>
+              <div id="entry-preview" class="editor-preview-panel hidden">
+                <!-- Live preview markdown render -->
+              </div>
+            </div>
+          </div>
+
+          <div class="editor-sidebar">
+            <!-- Tags Builder Card -->
+            <div class="glass-card editor-sidebar-card">
+              <h3>Categorization</h3>
+              <p class="card-desc">Group entries by activities, topics, or people.</p>
+              
+              <div class="tag-input-container">
+                <input type="text" id="tag-input" placeholder="Add tag (press Enter or comma)">
+                <button type="button" id="add-tag-btn" class="btn btn-sm">Add</button>
+              </div>
+              <div class="tags-container" id="editor-tags-list">
+                <!-- Dynamic tag chips -->
+              </div>
+            </div>
+
+            <!-- Image Upload Card -->
+            <div class="glass-card editor-sidebar-card">
+              <h3>Cover Image</h3>
+              <p class="card-desc">Attach an image memory to this day.</p>
+              
+              <div class="image-uploader" id="image-uploader-area">
+                <input type="file" id="image-file-input" accept="image/*" class="hidden">
+                <div class="uploader-prompt" id="uploader-prompt">
+                  <i data-lucide="image"></i>
+                  <span>Upload a photo</span>
+                  <span class="file-size-limit">Max size 2MB</span>
+                </div>
+                <div class="uploader-preview hidden" id="uploader-preview-container">
+                  <img id="entry-img-preview" src="" alt="Memory Cover">
+                  <button type="button" class="remove-img-btn" id="remove-img-btn" title="Remove Cover Photo">
+                    <i data-lucide="trash-2"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. CALENDAR VIEW -->
+      <section class="view-section" id="view-calendar">
+        <header class="view-header">
+          <div>
+            <h1 class="view-title">Memory Calendar</h1>
+            <p class="view-subtitle">Review your moods and history across days.</p>
+          </div>
+        </header>
+
+        <div class="calendar-layout">
+          <div class="calendar-card glass-card">
+            <div class="calendar-navigation">
+              <h2 id="calendar-month-year">June 2026</h2>
+              <div class="nav-arrows">
+                <button class="icon-btn" id="cal-prev-month" title="Previous Month">
+                  <i data-lucide="chevron-left"></i>
+                </button>
+                <button class="btn btn-sm" id="cal-today-btn">Today</button>
+                <button class="icon-btn" id="cal-next-month" title="Next Month">
+                  <i data-lucide="chevron-right"></i>
+                </button>
+              </div>
+            </div>
+            
+            <div class="calendar-grid-header">
+              <span>Sun</span>
+              <span>Mon</span>
+              <span>Tue</span>
+              <span>Wed</span>
+              <span>Thu</span>
+              <span>Fri</span>
+              <span>Sat</span>
+            </div>
+            
+            <div class="calendar-grid-body" id="calendar-days-grid">
+              <!-- Dynamically generated days -->
+            </div>
+          </div>
+
+          <div class="calendar-sidebar-details glass-card">
+            <h3>Selected Date</h3>
+            <div class="selected-day-info" id="selected-day-details">
+              <div class="empty-selection">
+                <i data-lucide="calendar-days"></i>
+                <p>Click a day on the calendar to see details or write an entry.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. ANALYTICS VIEW -->
+      <section class="view-section" id="view-analytics">
+        <header class="view-header">
+          <div>
+            <h1 class="view-title">Mind Analytics</h1>
+            <p class="view-subtitle">Visualize patterns, moods, and habits over time.</p>
+          </div>
+        </header>
+
+        <!-- Stats summary row -->
+        <div class="analytics-metrics-grid">
+          <div class="metric-card glass-card">
+            <span class="metric-label">Mood Score Average</span>
+            <span class="metric-value" id="analytic-avg-mood">—</span>
+            <span class="metric-desc">Out of 5 points</span>
+          </div>
+          <div class="metric-card glass-card">
+            <span class="metric-label">Total Words Written</span>
+            <span class="metric-value" id="analytic-total-words">0</span>
+            <span class="metric-desc">Across all journal logs</span>
+          </div>
+          <div class="metric-card glass-card">
+            <span class="metric-label">Unique Tags Utilized</span>
+            <span class="metric-value" id="analytic-unique-tags">0</span>
+            <span class="metric-desc">Categories created</span>
+          </div>
+        </div>
+
+        <div class="charts-container-grid">
+          <!-- Mood Line Chart -->
+          <div class="chart-card glass-card span-2">
+            <div class="chart-header">
+              <h3>Mood Trend Over Time</h3>
+              <p class="chart-subtitle">Chronological progression of daily scores</p>
+            </div>
+            <div class="chart-body" id="chart-mood-trend-container">
+              <!-- SVG chart dynamically drawn here -->
+              <svg id="svg-mood-trend" viewBox="0 0 800 280" width="100%" height="100%">
+                <!-- Dynamic SVG elements -->
+              </svg>
+            </div>
+          </div>
+
+          <!-- Mood Donut Chart -->
+          <div class="chart-card glass-card">
+            <div class="chart-header">
+              <h3>Mood Distribution</h3>
+              <p class="chart-subtitle">Proportion of your emotional states</p>
+            </div>
+            <div class="chart-body donut-chart-body" id="chart-mood-donut-container">
+              <svg id="svg-mood-donut" viewBox="0 0 200 200" width="100%" height="100%">
+                <!-- Dynamic donut SVG elements -->
+              </svg>
+              <div class="donut-legend" id="donut-legend-list">
+                <!-- Legend items with colors -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Tag bar charts -->
+          <div class="chart-card glass-card span-2">
+            <div class="chart-header">
+              <h3>Popular Tags</h3>
+              <p class="chart-subtitle">Frequently discussed tags in your entries</p>
+            </div>
+            <div class="chart-body" id="tag-frequency-container">
+              <!-- Custom styled bars or empty status -->
+              <div class="empty-chart-text">Not enough data. Start writing entries with tags!</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. SETTINGS VIEW -->
+      <section class="view-section" id="view-settings">
+        <header class="view-header">
+          <div>
+            <h1 class="view-title">Settings</h1>
+            <p class="view-subtitle">Manage preferences and customize your journal.</p>
+          </div>
+        </header>
+
+        <div class="settings-layout">
+          <div class="settings-group glass-card">
+            <h3>Profile Customization</h3>
+            <p class="settings-desc">Customize the name displayed in the workspace greetings.</p>
+            
+            <div class="field-group row-align">
+              <div class="input-inline">
+                <label for="settings-username">Your Name</label>
+                <input type="text" id="settings-username" placeholder="Alex">
+              </div>
+              <button class="btn btn-secondary" id="save-username-btn">Update Profile</button>
+            </div>
+          </div>
+
+          <!-- Cloud Sync Card -->
+          <div class="settings-group glass-card">
+            <h3>Cloud Synchronisation (Supabase)</h3>
+            <p class="settings-desc">Connect a remote cloud database to sync your entries automatically and access them from any device.</p>
+            
+            <div class="settings-supabase-fields">
+              <div class="field-group" style="margin-bottom: 1rem;">
+                <label for="settings-supabase-url">Supabase URL</label>
+                <input type="text" id="settings-supabase-url" placeholder="https://your-project-id.supabase.co">
+              </div>
+              <div class="field-group" style="margin-bottom: 1rem;">
+                <label for="settings-supabase-key">Supabase Anon Key</label>
+                <input type="text" id="settings-supabase-key" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
+              </div>
+              <div class="btn-group-row" style="margin-top: 1rem; margin-bottom: 0;">
+                <button class="btn btn-secondary" id="save-supabase-config-btn">Connect Backend</button>
+                <button class="btn btn-danger btn-sm hidden" id="clear-supabase-config-btn">Disconnect Cloud</button>
+              </div>
+            </div>
+
+            <!-- Auth Section -->
+            <div class="supabase-auth-panel hidden" id="supabase-auth-panel">
+              <div class="auth-divider"></div>
+              
+              <!-- When logged out -->
+              <div class="auth-logged-out" id="auth-logged-out-form">
+                <h4>Sign In to Cloud Vault</h4>
+                <p class="settings-desc">Enter your email and password to sync with your database.</p>
+                <div class="auth-fields-grid">
+                  <div class="field-group" style="margin-bottom: 1rem;">
+                    <label for="auth-email">Email Address</label>
+                    <input type="text" id="auth-email" placeholder="you@example.com" autocomplete="email">
+                  </div>
+                  <div class="field-group" style="margin-bottom: 1rem;">
+                    <label for="auth-password">Password</label>
+                    <input type="password" id="auth-password" placeholder="••••••••" autocomplete="current-password">
+                  </div>
+                </div>
+                <div class="btn-group-row" style="margin-top: 1rem; margin-bottom: 0;">
+                  <button class="btn btn-primary" id="btn-cloud-signin">Sign In</button>
+                  <button class="btn btn-secondary" id="btn-cloud-signup">Create Account</button>
+                </div>
+              </div>
+
+              <!-- When logged in -->
+              <div class="auth-logged-in hidden" id="auth-logged-in-panel">
+                <div class="user-connected-banner">
+                  <div class="connected-icon"><i data-lucide="cloud"></i></div>
+                  <div class="connected-text">
+                    <span class="conn-title">Cloud Vault Synced</span>
+                    <span class="conn-user" id="cloud-user-email">email@example.com</span>
+                  </div>
+                </div>
+                <div class="btn-group-row" style="margin-top: 1.25rem; margin-bottom: 0;">
+                  <button class="btn btn-secondary btn-sm" id="btn-cloud-sync-now">
+                    <i data-lucide="refresh-cw"></i> Sync Now
+                  </button>
+                  <button class="btn btn-danger btn-sm" id="btn-cloud-signout">Sign Out</button>
+                </div>
+              </div>
+            </div>
+
+          <div class="settings-group glass-card">
+            <h3>Theme & Styling</h3>
+            <p class="settings-desc">Adjust the visual presentation of the journal. Aetheria provides curated palettes.</p>
+            
+            <div class="theme-picker-grid">
+              <button class="theme-choice active" data-theme-val="dark">
+                <div class="theme-preview dark-theme">
+                  <div class="preview-dot p1"></div>
+                  <div class="preview-dot p2"></div>
+                </div>
+                <span>Dark Nebula</span>
+              </button>
+              <button class="theme-choice" data-theme-val="midnight">
+                <div class="theme-preview midnight-theme">
+                  <div class="preview-dot p1"></div>
+                  <div class="preview-dot p2"></div>
+                </div>
+                <span>Midnight Navy</span>
+              </button>
+              <button class="theme-choice" data-theme-val="light">
+                <div class="theme-preview light-theme">
+                  <div class="preview-dot p1"></div>
+                  <div class="preview-dot p2"></div>
+                </div>
+                <span>Light Aura</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="settings-group glass-card">
+            <h3>Backup & Export</h3>
+            <p class="settings-desc">Export your journal entries. It is highly recommended to save regular backups.</p>
+            
+            <div class="btn-group-row">
+              <button class="btn btn-secondary" onclick="app.exportToJSON()">
+                <i data-lucide="download"></i>
+                <span>Backup JSON Database</span>
+              </button>
+              <button class="btn btn-secondary" onclick="app.exportToMarkdown()">
+                <i data-lucide="file-text"></i>
+                <span>Export to Combined Text</span>
+              </button>
+            </div>
+
+            <div class="import-section">
+              <p class="import-title">Restore Journal from Backup</p>
+              <p class="settings-desc">Upload a previously exported JSON backup file. This will merge or overwrite current data.</p>
+              <div class="file-uploader-btn-wrapper">
+                <input type="file" id="import-json-input" accept=".json" class="hidden">
+                <button class="btn btn-secondary" id="trigger-import-btn">
+                  <i data-lucide="upload"></i>
+                  <span>Select JSON File</span>
+                </button>
+                <span class="selected-file-name" id="import-file-name">No file selected</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-group glass-card danger-zone">
+            <h3>Danger Zone</h3>
+            <p class="settings-desc">Permanently erase your data. This operation cannot be undone. All entries will be purged from local storage.</p>
+            
+            <button class="btn btn-danger" id="wipe-data-btn">
+              <i data-lucide="trash-2"></i>
+              <span>Wipe Entire Journal</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ENTRY DETAILS MODAL -->
+  <div class="modal-overlay" id="entry-details-modal">
+    <div class="modal-content glass-card">
+      <header class="modal-header">
+        <div class="modal-meta">
+          <span class="modal-date" id="modal-entry-date">June 22, 2026</span>
+          <span class="modal-mood-badge" id="modal-entry-mood">🔥 Rad</span>
+        </div>
+        <button class="modal-close-btn" id="modal-close-btn" aria-label="Close modal">
+          <i data-lucide="x"></i>
+        </button>
+      </header>
+      <div class="modal-body">
+        <h2 class="modal-title" id="modal-entry-title">Day Title</h2>
+        <div class="modal-image-container hidden" id="modal-image-container">
+          <img id="modal-entry-img" src="" alt="Cover Photo">
+        </div>
+        <div class="modal-text-content" id="modal-entry-content">
+          <!-- Markdown Rendered Text Content -->
+        </div>
+        <div class="modal-tags-list" id="modal-entry-tags">
+          <!-- Tag chips -->
+        </div>
+      </div>
+      <footer class="modal-footer">
+        <button class="btn btn-secondary btn-sm" id="modal-delete-btn">
+          <i data-lucide="trash-2"></i>
+          <span>Delete</span>
+        </button>
+        <button class="btn btn-primary btn-sm" id="modal-edit-btn">
+          <i data-lucide="edit-3"></i>
+          <span>Edit Entry</span>
+        </button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Supabase CDN Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Javascript -->
+  <script type="module" src="app.js"></script>
+</body>
+</html>
